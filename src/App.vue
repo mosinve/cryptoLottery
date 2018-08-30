@@ -5,17 +5,17 @@
       b-card(no-body)
         b-card-header Balance  {{ balance }}
         b-tabs(card)
-          b-tab(title = 'Refill token balance')
+          b-tab(title = 'Company Account Top up')
             form.form(@submit.prevent = 'mint')
               .form-group
                 input.form-control(type = 'number'
                                    placeholder = 'Amount of coins'
                                    v-model = 'amountToMint')
               button.btn.btn-primary(type = 'submit') Deposit
-          b-tab(title = 'Raffle prize')
+          b-tab(title = 'Pay to Employee')
             form.form(@submit.prevent = 'transferRandom')
-              | Transfer to {{ randomAccount }}
-              .form-group
+              | Winning Employee Account: {{ randomAccount }}
+              .form-group.mt-2
                 input.form-control(type = 'number'
                                    placeholder = 'Amount of coins'
                                    v-model = 'prize')

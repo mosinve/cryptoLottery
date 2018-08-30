@@ -11,6 +11,8 @@
  *     gasPrice: 10000000000,
  *   },
  */
+var HDWalletProvider = require('truffle-hdwallet-provider')
+var mnemonic = 'feed curve canoe expand champion west leaf chair ski grow spray dragon'
 
 module.exports = {
   // See <http://truffleframework.com/docs/advanced/configuration>
@@ -23,11 +25,10 @@ module.exports = {
       gas: 500000
     },
     rsk: {
-      gas: 2500000,
+      gas: 250000000,
       gasPrice: 1,
-      host: '40.113.113.161',
-      from: '0xcfb6620fb480e0de1d58f854fc58a35bb266dfaf',
-      port: 4444,
+      provider: () =>
+        new HDWalletProvider(mnemonic, 'http://40.113.113.161:4444'),
       network_id: '*' // Match any network id
     }
   }
