@@ -25,8 +25,8 @@ module.exports = {
       gas: 500000
     },
     rsk: {
-      gas: 2500000,
-      gasPrice: 183000,
+      gas: 5300000,
+      gasPrice: 200000,
       provider: () =>
         new HDWalletProvider(mnemonic, 'http://40.113.113.161:4444'),
       network_id: '*' // Match any network id

@@ -1,7 +1,7 @@
-pragma solidity ^0.4.22;
+pragma solidity ^0.4.19;
 import "../installed_contracts/oraclize-api/contracts/usingOraclize.sol";
-import "openzeppelin-solidity/contracts/token/ERC20/BasicToken.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "./BasicToken.sol";
+import "./Ownable.sol";
 
 contract LotteryToken is usingOraclize, BasicToken, Ownable {
 
@@ -20,12 +20,12 @@ contract LotteryToken is usingOraclize, BasicToken, Ownable {
     event MintFinished();
 
     modifier canMint() {
-        require(!mintingFinished, 'Minting in process');
+        require(!mintingFinished);
         _;
     }
 
     modifier hasMintPermission() {
-        require(msg.sender == owner, 'Only owner can mint');
+        require(msg.sender == owner);
         _;
     }
 
@@ -36,7 +36,7 @@ contract LotteryToken is usingOraclize, BasicToken, Ownable {
     }
 
     // Constructor
-    constructor()
+    function LotteryToken()
     payable
     public {
         symbol = "RNDT";
@@ -60,7 +60,7 @@ contract LotteryToken is usingOraclize, BasicToken, Ownable {
         uint maxRange = participants.length; // this is the highest uint we want to get. It should never be greater than 2^(8*N), where N is the number of random bytes we had asked the datasource to return
         randomNumber = uint(keccak256(_result)) % maxRange; // this is an efficient way to get the uint out in the [0, maxRange] range
 
-        emit newRandomNumber_uint(randomNumber); // this is the resulting random number (uint)
+        newRandomNumber_uint(randomNumber); // this is the resulting random number (uint)
         queriesActive[_queryId] = false;
     }
 
@@ -76,8 +76,8 @@ contract LotteryToken is usingOraclize, BasicToken, Ownable {
     {
         totalSupply_ = totalSupply_.add(_amount);
         balances[msg.sender] = balances[msg.sender].add(_amount);
-        emit Mint(msg.sender, _amount);
-        emit Transfer(address(0), msg.sender, _amount);
+        Mint(msg.sender, _amount);
+        Transfer(address(0), msg.sender, _amount);
         return true;
     }
 
@@ -87,7 +87,7 @@ contract LotteryToken is usingOraclize, BasicToken, Ownable {
      */
     function finishMinting() public onlyOwner canMint returns (bool) {
         mintingFinished = true;
-        emit MintFinished();
+        MintFinished();
         return true;
     }
 
