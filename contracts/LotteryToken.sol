@@ -41,7 +41,7 @@ contract LotteryToken is usingOraclize, BasicToken, Ownable {
     function LotteryToken()
     payable
     public {
-        symbol = "RNDT";
+        symbol = "EHT";
         name = "Random draw token";
         decimals = 2;
 
