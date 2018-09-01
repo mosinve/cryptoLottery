@@ -42,7 +42,7 @@ contract LotteryToken is usingOraclize, BasicToken, Ownable {
     payable
     public {
         symbol = "EHT";
-        name = "Random draw token";
+        name = "EHT token";
         decimals = 2;
 
         // Replace the next line with your version:
