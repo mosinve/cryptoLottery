@@ -22,10 +22,10 @@ module.exports = {
       host: 'localhost',
       port: 7545,
       network_id: '*', // Match any network id
-      gas: 500000
+      gas: 5000000
     },
     rsk: {
-      gas: 5300000,
+      gas: 6000000,
       gasPrice: 200000,
       provider: () =>
         new HDWalletProvider(mnemonic, 'http://40.113.113.161:4444'),

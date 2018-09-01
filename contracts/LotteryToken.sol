@@ -13,6 +13,8 @@ contract LotteryToken is usingOraclize, BasicToken, Ownable {
     mapping (address => bool) participantsMap;
     mapping (bytes32 => bool) queriesActive;
     bool public mintingFinished = false;
+    string string1 = '\n{"jsonrpc":"2.0","method":"generateIntegers","params":{"apiKey":"3ec5f580-110a-4f24-b505-656c58eac688","n":1,"min":0,"max":';
+    string string2 = ',"replacement":true,"base":10},"id":1}';
 
     event newRandomNumber_bytes(bytes);
     event newRandomNumber_uint(uint);
@@ -44,31 +46,27 @@ contract LotteryToken is usingOraclize, BasicToken, Ownable {
         decimals = 2;
 
         // Replace the next line with your version:
-//        OAR = OraclizeAddrResolverI(0x6f485C8BF6fc43eA212E93BBF8ce046C7f1cb475);
-//        oraclize_setProof(proofType_Ledger);
+//        oraclize_setProof(proofType_TLSNotary | proofStorage_IPFS);
     }
 
     function() payable onlyOwner public {
     }
 
-    function __callback(bytes32 _queryId, string _result, bytes _proof) public
+    function __callback(bytes32 _queryId, string _result) public
     {
         require(msg.sender == oraclize_cbAddress());
         require(queriesActive[_queryId]);
-        require(oraclize_randomDS_proofVerify__returnCode(_queryId, _result, _proof) == 0);
-
-        uint maxRange = participants.length; // this is the highest uint we want to get. It should never be greater than 2^(8*N), where N is the number of random bytes we had asked the datasource to return
-        randomNumber = uint(keccak256(_result)) % maxRange; // this is an efficient way to get the uint out in the [0, maxRange] range
+//        uint maxRange = participants.length; // this is the highest uint we want to get. It should never be greater than 2^(8*N), where N is the number of random bytes we had asked the datasource to return
+        randomNumber = parseInt(_result); // this is an efficient way to get the uint out in the [0, maxRange] range
 
         newRandomNumber_uint(randomNumber); // this is the resulting random number (uint)
-        queriesActive[_queryId] = false;
+        delete queriesActive[_queryId];
     }
 
     function update() payable {
-        uint N = 7; // number of random bytes we want the datasource to return
-        uint delay = 0; // number of seconds to wait before the execution takes place
-        uint callbackGas = 200000; // amount of gas we want Oraclize to set for the callback function
-        bytes32 queryId = oraclize_newRandomDSQuery(delay, N, callbackGas); // this function internally generates the correct oraclize_query and returns its queryId
+        require(oraclize_getPrice("URL") < this.balance);
+
+        bytes32 queryId = oraclize_query("URL", "json(https://api.random.org/json-rpc/1/invoke).result.random.data.0", strConcat(string1, uint2str(participants.length), string2)); // this function internally generates the correct oraclize_query and returns its queryId
         queriesActive[queryId] = true;
     }
 
@@ -98,28 +96,29 @@ contract LotteryToken is usingOraclize, BasicToken, Ownable {
             participantsMap[_to] = true;
             update();
         }
+        return true;
     }
 
-    function getParticipants(uint256 _from, uint256 _to)
-    public
-    constant
-    returns (bytes)
-    {
-        require(_from >= 0 && _to >= _from && participants.length >= _to);
-
-        // Size of bytes
-        uint256 size = 20 * (_to - _from + 1);
-        uint256 counter = 0;
-        bytes memory b = new bytes(size);
-        for (uint256 x = _from; x < _to + 1; x++) {
-            bytes memory elem = toBytes(participants[x]);
-            for (uint y = 0; y < 20; y++) {
-                b[counter] = elem[y];
-                counter++;
-            }
-        }
-        return b;
-    }
+//    function getParticipants(uint256 _from, uint256 _to)
+//    public
+//    constant
+//    returns (bytes)
+//    {
+//        require(_from >= 0 && _to >= _from && participants.length >= _to);
+//
+//        // Size of bytes
+//        uint256 size = 20 * (_to - _from + 1);
+//        uint256 counter = 0;
+//        bytes memory b = new bytes(size);
+//        for (uint256 x = _from; x < _to + 1; x++) {
+//            bytes memory elem = toBytes(participants[x]);
+//            for (uint y = 0; y < 20; y++) {
+//                b[counter] = elem[y];
+//                counter++;
+//            }
+//        }
+//        return b;
+//    }
 
     function getRandomParticipant() public returns(address) {
         require(participants.length > 0);
@@ -128,12 +127,12 @@ contract LotteryToken is usingOraclize, BasicToken, Ownable {
         return participants[randomNumber];
     }
 
-    function toBytes(address a) constant returns (bytes b){
-        assembly {
-            let m := mload(0x40)
-            mstore(add(m, 20), xor(0x140000000000000000000000000000000000000000, a))
-            mstore(0x40, add(m, 52))
-            b := m
-        }
-    }
+//    function toBytes(address a) constant returns (bytes b){
+//        assembly {
+//            let m := mload(0x40)
+//            mstore(add(m, 20), xor(0x140000000000000000000000000000000000000000, a))
+//            mstore(0x40, add(m, 52))
+//            b := m
+//        }
+//    }
 }
